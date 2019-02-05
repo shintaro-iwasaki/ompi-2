@@ -1,28 +1,27 @@
-dnl
-dnl Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
-dnl                         University Research and Technology
-dnl                         Corporation.  All rights reserved.
-dnl Copyright (c) 2004-2005 The University of Tennessee and The University
-dnl                         of Tennessee Research Foundation.  All rights
-dnl                         reserved.
-dnl Copyright (c) 2004-2005 High Performance Computing Center Stuttgart,
-dnl                         University of Stuttgart.  All rights reserved.
-dnl Copyright (c) 2004-2005 The Regents of the University of California.
-dnl                         All rights reserved.
-dnl Copyright (c) 2012      Cisco Systems, Inc.  All rights reserved.
-dnl Copyright (c) 2014      Intel, Inc. All rights reserved.
-dnl Copyright (c) 2014-2016 Research Organization for Information Science
-dnl                         and Technology (RIST). All rights reserved.
-dnl $COPYRIGHT$
-dnl
-dnl Additional copyrights may follow
-dnl
-dnl $HEADER$
-dnl
-dnl OPAL_CONFIG_POSIX_THREADS()
-dnl
-dnl Configure posix threads, setting the following variables (but
-dnl  not calling AC_SUBST on them).
+# -*- shell-script -*-
+#
+# Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
+#                         University Research and Technology
+#                         Corporation.  All rights reserved.
+# Copyright (c) 2004-2005 The University of Tennessee and The University
+#                         of Tennessee Research Foundation.  All rights
+#                         reserved.
+# Copyright (c) 2004-2005 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+# Copyright (c) 2004-2005 The Regents of the University of California.
+#                         All rights reserved.
+# Copyright (c) 2010      Cisco Systems, Inc.  All rights reserved.
+# Copyright (c) 2015      Research Organization for Information Science
+#                         and Technology (RIST). All rights reserved.
+# Copyright (c) 2019      Sandia National Laboratories.  All rights reserved.
+# Copyright (c) 2019      Triad National Security, LLC. All rights
+#                         reserved.
+# $COPYRIGHT$
+#
+# Additional copyrights may follow
+#
+# $HEADER$
+#
 
 # ********************************************************************
 #
@@ -281,11 +280,11 @@ if test "$opal_pthread_c_success" = "0"; then
                               opal_pthread_c_success=0)
     AC_LANG_POP(C)
     if test "$opal_pthread_c_success" = "1"; then
-      PTHREAD_CFLAGS="$pf"
+      TPKG_CFLAGS="$pf"
       AC_MSG_RESULT([yes])
       break
     else
-      PTHREAD_CFLAGS=
+      TPKG_CFLAGS=
       CFLAGS="$orig_CFLAGS"
       AC_MSG_RESULT([no])
     fi
@@ -307,11 +306,11 @@ if test "$opal_pthread_cxx_success" = "0"; then
                               opal_pthread_cxx_success=0)
     AC_LANG_POP(C++)
     if test "$opal_pthread_cxx_success" = "1"; then
-      PTHREAD_CXXFLAGS="$pf"
+      TPKG_CXXFLAGS="$pf"
       AC_MSG_RESULT([yes])
       break
     else
-      PTHREAD_CXXFLAGS=
+      TPKG_CXXFLAGS=
       CXXFLAGS="$orig_CXXFLAGS"
       AC_MSG_RESULT([no])
     fi
@@ -335,11 +334,11 @@ if test "$opal_pthread_fortran_success" = "0" && \
                                        opal_pthread_fortran_success=0)
     AC_LANG_POP(C)
     if test "$opal_pthread_fortran_success" = "1"; then
-      PTHREAD_FCFLAGS="$pf"
+      TPKG_FCFLAGS="$pf"
       AC_MSG_RESULT([yes])
       break
     else
-      PTHREAD_FCFLAGS=
+      TPKG_FCFLAGS=
       FCFLAGS="$orig_FCFLAGS"
       AC_MSG_RESULT([no])
     fi
@@ -406,14 +405,14 @@ if test "$opal_pthread_c_success" = "0"; then
     case "${host_cpu}-${host-_os}" in
       *-aix* | *-freebsd*)
         if test "`echo $CPPFLAGS | $GREP 'D_THREAD_SAFE'`" = ""; then
-          PTHREAD_CPPFLAGS="-D_THREAD_SAFE"
-          CPPFLAGS="$CPPFLAGS $PTHREAD_CPPFLAGS"
+          TPKG_CPPFLAGS="-D_THREAD_SAFE"
+          CPPFLAGS="$CPPFLAGS $TPKG_CPPFLAGS"
         fi
       ;;
       *)
         if test "`echo $CPPFLAGS | $GREP 'D_REENTRANT'`" = ""; then
-          PTHREAD_CPPFLAGS="-D_REENTRANT"
-          CPPFLAGS="$CPPFLAGS $PTHREAD_CPPFLAGS"
+          TPKG_CPPFLAGS="-D_REENTRANT"
+          CPPFLAGS="$CPPFLAGS $TPKG_CPPFLAGS"
         fi
       ;;
     esac
@@ -423,10 +422,10 @@ if test "$opal_pthread_c_success" = "0"; then
                               opal_pthread_c_success=0)
     AC_LANG_POP(C)
     if test "$opal_pthread_c_success" = "1"; then
-      PTHREAD_LIBS="$pl"
+      TPKG_LIBS="$pl"
       AC_MSG_RESULT([yes])
     else
-      PTHREAD_CPPFLAGS=
+      TPKG_CPPFLAGS=
       CPPFLAGS="$orig_CPPFLAGS"
       LIBS="$orig_LIBS"
       AC_MSG_RESULT([no])
@@ -441,23 +440,23 @@ AC_DEFUN([OPAL_INTL_POSIX_THREADS_LIBS_CXX],[
 # C++ compiler
 #
 if test "$opal_pthread_cxx_success" = "0"; then
-  if test ! "$opal_pthread_c_success" = "0" && test ! "$PTHREAD_LIBS" = "" ; then
-    AC_MSG_CHECKING([if C++ compiler and POSIX threads work with $PTHREAD_LIBS])
+  if test ! "$opal_pthread_c_success" = "0" && test ! "$TPKG_LIBS" = "" ; then
+    AC_MSG_CHECKING([if C++ compiler and POSIX threads work with $TPKG_LIBS])
     case "${host_cpu}-${host-_os}" in
       *-aix* | *-freebsd*)
         if test "`echo $CXXCPPFLAGS | $GREP 'D_THREAD_SAFE'`" = ""; then
-          PTHREAD_CXXCPPFLAGS="-D_THREAD_SAFE"
-          CXXCPPFLAGS="$CXXCPPFLAGS $PTHREAD_CXXCPPFLAGS"
+          TPKG_CXXCPPFLAGS="-D_THREAD_SAFE"
+          CXXCPPFLAGS="$CXXCPPFLAGS $TPKG_CXXCPPFLAGS"
         fi
       ;;
       *)
         if test "`echo $CXXCPPFLAGS | $GREP 'D_REENTRANT'`" = ""; then
-          PTHREAD_CXXCPPFLAGS="-D_REENTRANT"
-          CXXCPPFLAGS="$CXXCPPFLAGS $PTHREAD_CXXCPPFLAGS"
+          TPKG_CXXCPPFLAGS="-D_REENTRANT"
+          CXXCPPFLAGS="$CXXCPPFLAGS $TPKG_CXXCPPFLAGS"
         fi
       ;;
     esac
-    LIBS="$orig_LIBS $PTHREAD_LIBS"
+    LIBS="$orig_LIBS $TPKG_LIBS"
     AC_LANG_PUSH(C++)
     OPAL_INTL_PTHREAD_TRY_LINK(opal_pthread_cxx_success=1,
                               opal_pthread_cxx_success=0)
@@ -476,14 +475,14 @@ if test "$opal_pthread_cxx_success" = "0"; then
       case "${host_cpu}-${host-_os}" in
         *-aix* | *-freebsd*)
           if test "`echo $CXXCPPFLAGS | $GREP 'D_THREAD_SAFE'`" = ""; then
-            PTHREAD_CXXCPPFLAGS="-D_THREAD_SAFE"
-            CXXCPPFLAGS="$CXXCPPFLAGS $PTHREAD_CXXCPPFLAGS"
+            TPKG_CXXCPPFLAGS="-D_THREAD_SAFE"
+            CXXCPPFLAGS="$CXXCPPFLAGS $TPKG_CXXCPPFLAGS"
           fi
         ;;
         *)
           if test "`echo $CXXCPPFLAGS | $GREP 'D_REENTRANT'`" = ""; then
-            PTHREAD_CXXCPPFLAGS="-D_REENTRANT"
-            CXXCPPFLAGS="$CXXCPPFLAGS $PTHREAD_CXXCPPFLAGS"
+            TPKG_CXXCPPFLAGS="-D_REENTRANT"
+            CXXCPPFLAGS="$CXXCPPFLAGS $TPKG_CXXCPPFLAGS"
           fi
         ;;
       esac
@@ -493,10 +492,10 @@ if test "$opal_pthread_cxx_success" = "0"; then
                                 opal_pthread_cxx_success=0)
       AC_LANG_POP(C++)
       if test "$opal_pthread_cxx_success" = "1"; then
-	PTHREAD_LIBS="$pl"
+	TPKG_LIBS="$pl"
         AC_MSG_RESULT([yes])
       else
-        PTHREAD_CXXCPPFLAGS=
+        TPKG_CXXCPPFLAGS=
         CXXCPPFLAGS="$orig_CXXCPPFLAGS"
         LIBS="$orig_LIBS"
         AC_MSG_RESULT([no])
@@ -514,9 +513,9 @@ AC_DEFUN([OPAL_INTL_POSIX_THREADS_LIBS_FC],[
 if test "$opal_pthread_fortran_success" = "0" && \
    test "$OMPI_TRY_FORTRAN_BINDINGS" -gt "$OMPI_FORTRAN_NO_BINDINGS" && \
    test $ompi_fortran_happy -eq 1; then
-  if test ! "$opal_pthread_c_success" = "0" && test ! "$PTHREAD_LIBS" = "" ; then
-    AC_MSG_CHECKING([if Fortran compiler and POSIX threads work with $PTHREAD_LIBS])
-    LIBS="$orig_LIBS $PTHREAD_LIBS"
+  if test ! "$opal_pthread_c_success" = "0" && test ! "$TPKG_LIBS" = "" ; then
+    AC_MSG_CHECKING([if Fortran compiler and POSIX threads work with $TPKG_LIBS])
+    LIBS="$orig_LIBS $TPKG_LIBS"
     AC_LANG_PUSH(C)
     OPAL_INTL_PTHREAD_TRY_LINK_FORTRAN(opal_pthread_fortran_success=1,
                                        opal_pthread_fortran_success=0)
@@ -537,7 +536,7 @@ if test "$opal_pthread_fortran_success" = "0" && \
                                          opal_pthread_fortran_success=0)
       AC_LANG_POP(C)
       if test "$opal_pthread_fortran_success" = "1"; then
-	PTHREAD_LIBS="$pl"
+	TPKG_LIBS="$pl"
         AC_MSG_RESULT([yes])
         break
       else
@@ -600,13 +599,13 @@ orig_CXXCPPFLAGS="$CXXCPPFLAGS"
 orig_LDFLAGS="$LDFLAGS"
 orig_LIBS="$LIBS"
 
-PTHREAD_CFLAGS=
-PTHREAD_FCFLAGS=
-PTHREAD_CXXFLAGS=
-PTHREAD_CPPFLAGS=
-PTHREAD_CXXCPPFLAGS=
-PTHREAD_LDFLAGS=
-PTHREAD_LIBS=
+TPKG_CFLAGS=
+TPKG_FCFLAGS=
+TPKG_CXXFLAGS=
+TPKG_CPPFLAGS=
+TPKG_CXXCPPFLAGS=
+TPKG_LDFLAGS=
+TPKG_LIBS=
 
 # Try with the basics, mam.
 OPAL_INTL_POSIX_THREADS_PLAIN
@@ -665,12 +664,66 @@ if test "$opal_pthread_c_success" = "1" && \
    test "$opal_pthread_cxx_success" = "1" && \
    test "$opal_pthread_fortran_success" = "1"; then
   internal_useless=1
+AC_MSG_RESULT("looks like posix threads work")
   $1
 else
   internal_useless=1
+AC_MSG_RESULT("looks like posix threads don't work")
   $2
 fi
 
 unset opal_pthread_c_success opal_pthread_fortran_success opal_pthread_cxx_success
 unset internal_useless
 ])dnl
+
+AC_DEFUN([MCA_opal_threads_pthreads_PRIORITY], [30])
+
+AC_DEFUN([MCA_opal_threads_pthreads_COMPILE_MODE], [
+    AC_MSG_CHECKING([for MCA component $2:$3 compile mode])
+    $4="static"
+    AC_MSG_RESULT([$$4])
+])
+
+
+# If component was selected, $1 will be 1 and we should set the base header
+AC_DEFUN([MCA_opal_threads_pthreads_POST_CONFIG],[
+    AS_IF([test "$1" = "1"], 
+          [opal_thread_type_found="pthreads"
+           AC_DEFINE_UNQUOTED([MCA_threads_base_include_HEADER],
+                              ["opal/mca/threads/pthreads/threads_pthreads_threads.h"],
+                              [Header to include for threads implementation])
+           AC_DEFINE_UNQUOTED([MCA_threads_mutex_base_include_HEADER],
+                              ["opal/mca/threads/pthreads/threads_pthreads_mutex.h"],
+                              [Header to include for mutex implementation])
+           AC_DEFINE_UNQUOTED([MCA_threads_tsd_base_include_HEADER],
+                              ["opal/mca/threads/pthreads/threads_pthreads_tsd.h"],
+                              [Header to include for tsd implementation])
+           AC_DEFINE_UNQUOTED([MCA_threads_wait_sync_base_include_HEADER],
+                              ["opal/mca/threads/pthreads/threads_pthreads_wait_sync.h"],
+                              [Header to include for wait_sync implementation])
+           THREAD_CFLAGS="$TPKG_CFLAGS"
+           THREAD_FCFLAGS="$TPKG_FCFLAGS"
+           THREAD_CXXFLAGS="$TPKG_CXXFLAGS"
+           THREAD_CPPFLAGS="$TPKG_CPPFLAGS"
+           THREAD_CXXCPPFLAGS="$TPKG_CXXCPPFLAGS"
+           THREAD_LDFLAGS="$TPKG_LDFLAGS"
+           THREAD_LIBS="$TPKG_LIBS"
+          ])
+])dnl
+
+# MCA_threads_pthreads_CONFIG(action-if-can-compile,
+#                        [action-if-cant-compile])
+# ------------------------------------------------
+AC_DEFUN([MCA_opal_threads_pthreads_CONFIG],[
+    AC_CONFIG_FILES([opal/mca/threads/pthreads/Makefile])
+
+    AS_IF([test -z "$with_threads" || test "$with_threads" = "pthreads" || test "$with_threads" = "yes"],
+          [OPAL_CONFIG_POSIX_THREADS([posix_threads_works=1],[posix_threads_works=0])],
+          [posix_threads_works=0])
+
+    AS_IF([test "$posix_threads_works" = "1"],
+          [$1],
+          [$2])
+   AC_MSG_RESULT("posix_threads_works = $posix_threads_works")
+])
+
