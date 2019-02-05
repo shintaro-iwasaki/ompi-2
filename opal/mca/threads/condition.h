@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2007 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -13,14 +14,19 @@
  *                         reserved.
  * Copyright (c) 2015      Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2019      Sandia National Laboratories. All rights reserved.
+ * Copyright (c) 2019      Triad National Security, LLC. All rights
+ *                         reserved.
+ *
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
  *
  * $HEADER$
  */
-#ifndef OPAL_CONDITION_SPINLOCK_H
-#define OPAL_CONDITION_SPINLOCK_H
+
+#ifndef OPAL_MCA_THREADS_CONDITION_H
+#define OPAL_MCA_THREADS_CONDITION_H
 
 #include "opal_config.h"
 #ifdef HAVE_SYS_TIME_H
@@ -29,7 +35,7 @@
 #include <time.h>
 #include <pthread.h>
 
-#include "opal/threads/mutex.h"
+#include "opal/mca/threads/mutex.h"
 #include "opal/runtime/opal_progress.h"
 
 #include "opal/runtime/opal_cr.h"
@@ -65,14 +71,14 @@ static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
             opal_mutex_lock(m);
             return 0;
         }
-        while (c->c_signaled == 0) {
+        while (0 == c->c_signaled) {
             opal_mutex_unlock(m);
             opal_progress();
             OPAL_CR_TEST_CHECKPOINT_READY_STALL();
             opal_mutex_lock(m);
         }
     } else {
-        while (c->c_signaled == 0) {
+        while (0 == c->c_signaled) {
             opal_progress();
             OPAL_CR_TEST_CHECKPOINT_READY_STALL();
         }
@@ -83,8 +89,7 @@ static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
     return rc;
 }
 
-static inline int opal_condition_timedwait(opal_condition_t *c,
-                                           opal_mutex_t *m,
+static inline int opal_condition_timedwait(opal_condition_t *c, opal_mutex_t *m,
                                            const struct timespec *abstime)
 {
     struct timeval tv;
@@ -95,32 +100,34 @@ static inline int opal_condition_timedwait(opal_condition_t *c,
     if (opal_using_threads()) {
         absolute.tv_sec = abstime->tv_sec;
         absolute.tv_usec = abstime->tv_nsec / 1000;
-        gettimeofday(&tv,NULL);
-        if (c->c_signaled == 0) {
+        gettimeofday(&tv, NULL);
+        if (0 == c->c_signaled) {
             do {
                 opal_mutex_unlock(m);
                 opal_progress();
-                gettimeofday(&tv,NULL);
+                gettimeofday(&tv, NULL);
                 opal_mutex_lock(m);
-                } while (c->c_signaled == 0 &&
-                         (tv.tv_sec <= absolute.tv_sec ||
-                          (tv.tv_sec == absolute.tv_sec && tv.tv_usec < absolute.tv_usec)));
+            } while (0 == c->c_signaled && (tv.tv_sec <= absolute.tv_sec ||
+                                            (tv.tv_sec == absolute.tv_sec &&
+                                             tv.tv_usec < absolute.tv_usec)));
         }
     } else {
         absolute.tv_sec = abstime->tv_sec;
         absolute.tv_usec = abstime->tv_nsec / 1000;
-        gettimeofday(&tv,NULL);
-        if (c->c_signaled == 0) {
+        gettimeofday(&tv, NULL);
+        if (0 == c->c_signaled) {
             do {
                 opal_progress();
-                gettimeofday(&tv,NULL);
-                } while (c->c_signaled == 0 &&
-                         (tv.tv_sec <= absolute.tv_sec ||
-                          (tv.tv_sec == absolute.tv_sec && tv.tv_usec < absolute.tv_usec)));
+                gettimeofday(&tv, NULL);
+            } while (0 == c->c_signaled && (tv.tv_sec <= absolute.tv_sec ||
+                                            (tv.tv_sec == absolute.tv_sec &&
+                                             tv.tv_usec < absolute.tv_usec)));
         }
     }
 
-    if (c->c_signaled != 0) c->c_signaled--;
+    if (0 != c->c_signaled) {
+        c->c_signaled--;
+    }
     c->c_waiting--;
     return rc;
 }
@@ -141,5 +148,4 @@ static inline int opal_condition_broadcast(opal_condition_t *c)
 
 END_C_DECLS
 
-#endif
-
+#endif /* OPAL_MCA_THREADS_CONDITION_H */

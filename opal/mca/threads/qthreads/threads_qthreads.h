@@ -1,3 +1,4 @@
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2005 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -9,6 +10,12 @@
  *                         University of Stuttgart.  All rights reserved.
  * Copyright (c) 2004-2005 The Regents of the University of California.
  *                         All rights reserved.
+ * Copyright (c) 2007-2016 Los Alamos National Security, LLC.  All rights
+ *                         reserved.
+ * Copyright (c) 2015      Research Organization for Information Science
+ *                         and Technology (RIST). All rights reserved.
+ * Copyright (c) 2019      Sandia National Laboratories.  All rights reserved.
+ *
  * $COPYRIGHT$
  *
  * Additional copyrights may follow
@@ -16,23 +23,14 @@
  * $HEADER$
  */
 
-#include "opal_config.h"
+#ifndef  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H
+#define  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H 1
 
-#include "opal/threads/condition.h"
+#include <qthread/qthread.h>
 
-
-static void opal_condition_construct(opal_condition_t *c)
-{
-    c->c_waiting = 0;
-    c->c_signaled = 0;
+static inline void ensure_init_qthreads(void) {
+	if (qthread_initialize() != 0)
+		qthread_initialize();
 }
 
-
-static void opal_condition_destruct(opal_condition_t *c)
-{
-}
-
-OBJ_CLASS_INSTANCE(opal_condition_t,
-                   opal_object_t,
-                   opal_condition_construct,
-                   opal_condition_destruct);
+#endif /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H */
