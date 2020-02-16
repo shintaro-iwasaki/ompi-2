@@ -15,6 +15,8 @@
  * Copyright (c) 2015-2016 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2019      Sandia National Laboratories.  All rights reserved.
+ * Copyright (c) 2020      Triad National Security, LLC. All rights
+ *                         reserved.
  *
  * $COPYRIGHT$
  *
@@ -45,6 +47,7 @@
 
 #include "opal/class/opal_object.h"
 #include "opal/sys/atomic.h"
+#include "opal/util/output.h"
 
 BEGIN_C_DECLS
 
@@ -126,8 +129,7 @@ static inline int opal_mutex_trylock(opal_mutex_t *m)
     int ret = pthread_mutex_trylock(&m->m_lock_pthread);
     if (EDEADLK == ret) {
         errno = ret;
-        perror("opal_mutex_trylock()");
-        abort();
+        opal_output(0,"opal_mutex_trylock() %d",ret);
     }
     return ret;
 #else
@@ -141,8 +143,7 @@ static inline void opal_mutex_lock(opal_mutex_t *m)
     int ret = pthread_mutex_lock(&m->m_lock_pthread);
     if (EDEADLK == ret) {
         errno = ret;
-        perror("opal_mutex_lock()");
-        abort();
+        opal_output(0,"opal_mutex_lock() %d", ret);
     }
 #else
     pthread_mutex_lock(&m->m_lock_pthread);
@@ -155,8 +156,7 @@ static inline void opal_mutex_unlock(opal_mutex_t *m)
     int ret = pthread_mutex_unlock(&m->m_lock_pthread);
     if (EPERM == ret) {
         errno = ret;
-        perror("opal_mutex_unlock");
-        abort();
+        opal_output(0,"opal_mutex_unlock() %d", ret);
     }
 #else
     pthread_mutex_unlock(&m->m_lock_pthread);

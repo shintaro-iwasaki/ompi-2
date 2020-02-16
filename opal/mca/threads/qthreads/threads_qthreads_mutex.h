@@ -15,6 +15,8 @@
  * Copyright (c) 2015-2016 Research Organization for Information Science
  *                         and Technology (RIST). All rights reserved.
  * Copyright (c) 2019      Sandia National Laboratories.  All rights reserved.
+ * Copyright (c) 2020      Triad National Security, LLC. All rights
+ *                         reserved.
  *
  * $COPYRIGHT$
  *
@@ -43,6 +45,7 @@
 
 #include "opal/class/opal_object.h"
 #include "opal/sys/atomic.h"
+#include "opal/util/output.h"
 
 #include <qthread/qthread.h>
 
@@ -115,8 +118,7 @@ static inline int opal_mutex_trylock(opal_mutex_t *m)
     int ret = qthread_readFE_nb(NULL, &m->m_lock_qthreads);
     if (ret != 0) {
         errno = ret;
-        perror("opal_mutex_trylock()");
-        abort();
+        opal_output(0, "opal_mutex_trylock() %d", ret);
     }
     return ret;
 #else
@@ -131,8 +133,7 @@ static inline void opal_mutex_lock(opal_mutex_t *m)
     int ret = qthread_lock(&m->m_lock_qthreads);
     if (ret != 0) {
         errno = ret;
-        perror("opal_mutex_lock()");
-        abort();
+        opal_output(0, "opal_mutex_lock() %d", ret);
     }
 #else
     qthread_lock(&m->m_lock_qthreads);
@@ -147,8 +148,7 @@ static inline void opal_mutex_unlock(opal_mutex_t *m)
     int ret = qthread_unlock(&m->m_lock_qthreads);
     if (ret != 0) {
         errno = ret;
-        perror("opal_mutex_unlock");
-        abort();
+        opal_output(0, "opal_mutex_unlock() %d", ret);
     }
 #else
     qthread_unlock(&m->m_lock_qthreads);
