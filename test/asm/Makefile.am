@@ -67,19 +67,19 @@ atomic_math_noinline.c:
 	ln -s $(top_srcdir)/test/asm/atomic_math.c atomic_math_noinline.c
 atomic_math_noinline_SOURCES = atomic_math_noinline.c
 atomic_math_noinline_CFLAGS = $(AM_CFLAGS) -DOMPI_DISABLE_INLINE_ASM
-atomic_math_noinline_LDADD = $(libs)
+atomic_math_noinline_LDADD = $(THREAD_LDFLAGS) $(THREAD_LIBS) $(libs)
 
 ######################################################################
 
 atomic_cmpset_SOURCES = atomic_cmpset.c
 atomic_cmpset_CFLAGS = $(AM_CFLAGS)
-atomic_cmpset_LDADD = $(libs)
+atomic_cmpset_LDADD = $(THREAD_LDFLAGS) $(THREAD_LIBS) $(libs)
 
 atomic_cmpset_noinline.c:
 	ln -s $(top_srcdir)/test/asm/atomic_cmpset.c atomic_cmpset_noinline.c
 atomic_cmpset_noinline_SOURCES = atomic_cmpset_noinline.c
 atomic_cmpset_noinline_CFLAGS = $(AM_CFLAGS) -DOMPI_DISABLE_INLINE_ASM
-atomic_cmpset_noinline_LDADD = $(libs)
+atomic_cmpset_noinline_LDADD = $(THREAD_LDFLAGS) $(THREAD_LIBS) $(libs)
 
 ######################################################################
 
