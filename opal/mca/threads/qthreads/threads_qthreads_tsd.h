@@ -24,8 +24,8 @@
  */
 
 
-#ifndef  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H
-#define  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H 1
+#ifndef OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H
+#define OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H
 
 #include "opal/mca/threads/qthreads/threads_qthreads.h"
 #include <qthread/qthread.h>

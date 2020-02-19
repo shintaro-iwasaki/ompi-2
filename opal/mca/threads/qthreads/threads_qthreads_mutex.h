@@ -25,8 +25,8 @@
  * $HEADER$
  */
 
-#ifndef  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H
-#define  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H 1
+#ifndef OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H
+#define OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H
 
 /**
  * @file:
@@ -99,7 +99,6 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
         .m_recursive = 1,                                               \
         .m_lock_atomic = OPAL_ATOMIC_LOCK_INIT,                         \
     }
-#endif
 
 /************************************************************************
  *
@@ -240,4 +239,4 @@ static inline int opal_cond_destroy(opal_cond_t *cond) {
 
 END_C_DECLS
 
-//#endif           /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H */
+#endif /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H */
