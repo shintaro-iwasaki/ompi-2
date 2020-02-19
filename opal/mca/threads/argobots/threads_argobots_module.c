@@ -91,7 +91,7 @@ int opal_thread_join(opal_thread_t *t, void **thr_return)
     return (0 == rc) ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
-void opal_thread_set_main()
+void opal_thread_set_main(void)
 {
     opal_threads_argobots_ensure_init();
     opal_main_thread = opal_thread_get_argobots_self();
