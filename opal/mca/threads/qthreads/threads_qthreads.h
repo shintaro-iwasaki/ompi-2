@@ -29,8 +29,8 @@
 #include <qthread/qthread.h>
 
 static inline void ensure_init_qthreads(void) {
-	if (qthread_initialize() != 0)
-		qthread_initialize();
+    if (qthread_initialize() != 0)
+        qthread_initialize();
 }
 
 #endif /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H */
