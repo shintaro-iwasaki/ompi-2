@@ -85,13 +85,12 @@ bool opal_thread_self_compare(opal_thread_t *t)
 
 int opal_thread_join(opal_thread_t *t, void **thr_return)
 {
-    opal_threads_argobots_ensure_init();
     int rc = ABT_thread_free(&t->t_handle);
     if (thr_return) {
         *thr_return = t->t_ret;
     }
     t->t_handle = ABT_THREAD_NULL;
-    return (0 == rc) ? OPAL_SUCCESS : OPAL_ERROR;
+    return (ABT_SUCCESS == rc) ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
 void opal_thread_set_main()
@@ -105,7 +104,7 @@ int opal_thread_start(opal_thread_t *t)
     opal_threads_argobots_ensure_init();
     int rc;
     if (OPAL_ENABLE_DEBUG) {
-        if (NULL == t->t_run || t->t_handle != ABT_THREAD_NULL) {
+        if (NULL == t->t_run || ABT_THREAD_NULL != t->t_handle) {
             return OPAL_ERR_BAD_PARAM;
         }
     }
@@ -116,17 +115,18 @@ int opal_thread_start(opal_thread_t *t)
                                       opal_thread_argobots_wrapper, t,
                                       ABT_THREAD_ATTR_NULL, &t->t_handle);
 
-    return (0 == rc) ? OPAL_SUCCESS : OPAL_ERROR;
+    return (ABT_SUCCESS == rc) ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
-opal_class_t opal_thread_t_class;
+OBJ_CLASS_DECLARATION(opal_thread_t);
 
 int opal_tsd_key_create(opal_tsd_key_t *key, opal_tsd_destructor_t destructor)
 {
     opal_threads_argobots_ensure_init();
     int rc;
     rc = ABT_key_create(destructor, key);
-    if ((0 == rc) && (opal_thread_get_argobots_self() == opal_main_thread)) {
+    if ((ABT_SUCCESS == rc) &&
+        (opal_thread_get_argobots_self() == opal_main_thread)) {
         opal_tsd_key_values = (struct opal_tsd_key_value *)
             realloc(opal_tsd_key_values, (opal_tsd_key_values_count + 1) *
                                              sizeof(struct opal_tsd_key_value));
@@ -134,12 +134,11 @@ int opal_tsd_key_create(opal_tsd_key_t *key, opal_tsd_destructor_t destructor)
         opal_tsd_key_values[opal_tsd_key_values_count].destructor = destructor;
         opal_tsd_key_values_count++;
     }
-    return rc;
+    return (ABT_SUCCESS == rc) ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
 int opal_tsd_keys_destruct(void)
 {
-    opal_threads_argobots_ensure_init();
     int i;
     void *ptr;
     for (i = 0; i < opal_tsd_key_values_count; i++) {

@@ -12,7 +12,7 @@
  *                         All rights reserved.
  * Copyright (c) 2006      Los Alamos National Security, LLC.  All rights
  *                         reserved.
- * Copyright (c) 2008-2020 Cisco Systems, Inc.  All rights reserved
+ * Copyright (c) 2008-2015 Cisco Systems, Inc.  All rights reserved.
  * Copyright (c) 2009      Oak Ridge National Labs.  All rights reserved.
  * Copyright (c) 2010-2014 Los Alamos National Security, LLC.
  *                         All rights reserved.
@@ -59,10 +59,6 @@ char *opal_set_max_sys_limits = NULL;
 char *opal_timing_sync_file = NULL;
 char *opal_timing_output = NULL;
 bool opal_timing_overhead = true;
-#endif
-
-#if OPAL_ENABLE_DEBUG
-bool opal_debug_threads = false;
 #endif
 
 bool opal_built_with_cuda_support = OPAL_INT_TO_BOOL(OPAL_CUDA_SUPPORT);

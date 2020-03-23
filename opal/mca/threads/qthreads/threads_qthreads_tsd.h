@@ -24,8 +24,8 @@
  */
 
 
-#ifndef  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H
-#define  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H 1
+#ifndef OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H
+#define OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_TSD_H 1
 
 #include "opal/mca/threads/qthreads/threads_qthreads.h"
 #include <qthread/qthread.h>
@@ -33,20 +33,17 @@
 
 typedef qthread_key_t opal_tsd_key_t;
 
-static inline int
-opal_tsd_key_delete(opal_tsd_key_t key)
+static inline int opal_tsd_key_delete(opal_tsd_key_t key)
 {
-    return qthread_key_delete(&key);
+    return 0 == qthread_key_delete(&key) ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
-static inline int
-opal_tsd_setspecific(opal_tsd_key_t key, void *value)
+static inline int opal_tsd_setspecific(opal_tsd_key_t key, void *value)
 {
-    return qthread_setspecific(key, value);
+    return 0 == qthread_setspecific(key, value) ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
-static inline int
-opal_tsd_getspecific(opal_tsd_key_t key, void **valuep)
+static inline int opal_tsd_getspecific(opal_tsd_key_t key, void **valuep)
 {
     qthread_getspecific(key);
     return OPAL_SUCCESS;

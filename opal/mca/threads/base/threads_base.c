@@ -25,6 +25,10 @@
 #include "opal/constants.h"
 #include "opal/mca/threads/base/base.h"
 
+#if OPAL_ENABLE_DEBUG
+bool opal_debug_threads = false;
+#endif
+
 /*
  * The following file was created by configure.  It contains extern
  * statements and the definition of an array of pointers to each
@@ -41,6 +45,6 @@ static int mca_threads_base_register(mca_base_register_flag_t flags)
  * Globals
  */
 /* Use default register/open/close functions */
-MCA_BASE_FRAMEWORK_DECLARE(opal, threads, "OPAL OS threads",
+MCA_BASE_FRAMEWORK_DECLARE(opal, threads, "OPAL threads",
                            mca_threads_base_register, NULL, NULL,
                            mca_threads_base_static_components, 0);

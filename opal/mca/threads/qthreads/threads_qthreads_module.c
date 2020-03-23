@@ -57,17 +57,17 @@ opal_thread_t *opal_thread_get_self(void)
 
 bool opal_thread_self_compare(opal_thread_t *t)
 {
-    return OPAL_ERROR;
+    return OPAL_ERR_NOT_IMPLEMENTED;
 }
 
 int sync_wait_mt(void *p)
 {
-    return OPAL_ERROR;
+    return OPAL_ERR_NOT_IMPLEMENTED;
 }
 
 int opal_thread_join(opal_thread_t *t, void **thr_return)
 {
-    return OPAL_ERROR;
+    return OPAL_ERR_NOT_IMPLEMENTED;
 }
 
 void opal_thread_set_main(void)
@@ -79,7 +79,7 @@ int opal_thread_start(opal_thread_t *t)
     return OPAL_ERR_NOT_IMPLEMENTED;
 }
 
-opal_class_t opal_thread_t_class;
+OBJ_CLASS_DECLARATION(opal_thread_t);
 
 int opal_tsd_key_create(opal_tsd_key_t *key, opal_tsd_destructor_t destructor)
 {

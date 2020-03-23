@@ -32,3 +32,5 @@ libmca_threads_argobots_la_SOURCES = \
     threads_argobots_tsd.h \
     threads_argobots_wait_sync.c \
     threads_argobots_wait_sync.h
+
+AM_LDFLAGS = -labt

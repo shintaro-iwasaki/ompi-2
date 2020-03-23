@@ -62,8 +62,9 @@ typedef void *opal_tsd_key_t;
  *
  * @param key[in]       The key for accessing thread-specific data
  *
- * @retval OPAL_SUCCESS Success
- * @retval EINVAL       Invalid key
+ * @retval OPAL_SUCCESS      Success
+ * @retval OPAL_ERROR        Error
+ * @retval OPAL_ERR_IN_ERRNO Error
  */
 OPAL_DECLSPEC int opal_tsd_key_delete(opal_tsd_key_t key);
 
@@ -81,10 +82,9 @@ OPAL_DECLSPEC int opal_tsd_key_delete(opal_tsd_key_t key);
  * @param key[in]       Thread specific data key to modify
  * @param value[in]     Value to associate with key
  *
- * @retval OPAL_SUCCESS Success
- * @retval ENOMEM       Insufficient memory exists to associate the
- *                      value with the key
- * @retval EINVAL       Invalid key
+ * @retval OPAL_SUCCESS      Success
+ * @retval OPAL_ERR          Error
+ * @retval OPAL_ERR_IN_ERRNO Error
  */
 OPAL_DECLSPEC int opal_tsd_setspecific(opal_tsd_key_t key, void *value);
 
@@ -97,13 +97,12 @@ OPAL_DECLSPEC int opal_tsd_setspecific(opal_tsd_key_t key, void *value);
  * called in the current thread with the given key, NULL is returned
  * in valuep.
  *
- * @param key[in]       Thread specific data key to modify
+ * @param key[in]        Thread specific data key to modify
  * @param value[out]     Value to associate with key
  *
- * @retval OPAL_SUCCESS Success
- * @retval ENOMEM       Insufficient memory exists to associate the
- *                      value with the key
- * @retval EINVAL       Invalid key
+ * @retval OPAL_SUCCESS      Success
+ * @retval OPAL_ERR          Error
+ * @retval OPAL_ERR_IN_ERRNO Error
  */
 OPAL_DECLSPEC int opal_tsd_getspecific(opal_tsd_key_t key, void **valuep);
 
@@ -134,10 +133,9 @@ OPAL_DECLSPEC int opal_tsd_getspecific(opal_tsd_key_t key, void **valuep);
  * @param key[out]       The key for accessing thread-specific data
  * @param destructor[in] Cleanup function to call when a thread exits
  *
- * @retval OPAL_SUCCESS  Success
- * @retval EAGAIN        The system lacked the necessary resource to
- *                       create another thread specific data key
- * @retval ENOMEM        Insufficient memory exists to create the key
+ * @retval OPAL_SUCCESS      Success
+ * @retval OPAL_ERR          Error
+ * @retval OPAL_ERR_IN_ERRNO Error
  */
 OPAL_DECLSPEC int opal_tsd_key_create(opal_tsd_key_t *key,
                                       opal_tsd_destructor_t destructor);

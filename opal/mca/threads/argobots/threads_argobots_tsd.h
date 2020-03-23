@@ -34,21 +34,21 @@ typedef ABT_key opal_tsd_key_t;
 
 static inline int opal_tsd_key_delete(opal_tsd_key_t key)
 {
-    opal_threads_argobots_ensure_init();
-    return ABT_key_free(&key);
+    int ret = ABT_key_free(&key);
+    return ABT_SUCCESS == ret ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
 static inline int opal_tsd_setspecific(opal_tsd_key_t key, void *value)
 {
     opal_threads_argobots_ensure_init();
-    return ABT_key_set(key, value);
+    int ret = ABT_key_set(key, value);
+    return ABT_SUCCESS == ret ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
 static inline int opal_tsd_getspecific(opal_tsd_key_t key, void **valuep)
 {
-    opal_threads_argobots_ensure_init();
-    ABT_key_get(key, valuep);
-    return OPAL_SUCCESS;
+    int ret = ABT_key_get(key, valuep);
+    return ABT_SUCCESS == ret ? OPAL_SUCCESS : OPAL_ERROR;
 }
 
 #endif /* OPAL_MCA_THREADS_ARGOBOTS_THREADS_ARGOBOTS_TSD_H */

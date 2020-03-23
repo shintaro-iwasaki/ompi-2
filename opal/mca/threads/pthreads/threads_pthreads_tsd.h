@@ -34,12 +34,14 @@ typedef pthread_key_t opal_tsd_key_t;
 
 static inline int opal_tsd_key_delete(opal_tsd_key_t key)
 {
-    return pthread_key_delete(key);
+    int ret = pthread_key_delete(key);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
 }
 
 static inline int opal_tsd_setspecific(opal_tsd_key_t key, void *value)
 {
-    return pthread_setspecific(key, value);
+    int ret = pthread_setspecific(key, value);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
 }
 
 static inline int opal_tsd_getspecific(opal_tsd_key_t key, void **valuep)

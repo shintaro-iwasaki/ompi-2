@@ -47,7 +47,7 @@ static int evthread_argobots_lock(unsigned mode, void *_lock)
     } else {
         ret = ABT_mutex_lock(lock);
     }
-    return ret;
+    return ABT_SUCCESS == ret ? 0 : -1;
 }
 
 static int evthread_argobots_unlock(unsigned mode, void *_lock)
@@ -56,7 +56,7 @@ static int evthread_argobots_unlock(unsigned mode, void *_lock)
     int ret = ABT_mutex_unlock(lock);
     /* This yield is necessary to avoid taking a lock consecutively. */
     ABT_thread_yield();
-    return ret;
+    return ABT_SUCCESS == ret ? 0 : -1;
 }
 
 static unsigned long evthread_argobots_get_id(void)
@@ -82,19 +82,19 @@ static void evthread_argobots_cond_free(void *_cond)
 static int evthread_argobots_cond_signal(void *_cond, int broadcast)
 {
     ABT_cond cond = _cond;
-    int r;
+    int ret;
     if (broadcast) {
-        r = ABT_cond_broadcast(cond);
+        ret = ABT_cond_broadcast(cond);
     } else {
-        r = ABT_cond_signal(cond);
+        ret = ABT_cond_signal(cond);
     }
-    return r ? -1 : 0;
+    return ABT_SUCCESS == ret ? 0 : -1;
 }
 
 static int evthread_argobots_cond_wait(void *_cond, void *_lock,
                                        const struct timeval *tv)
 {
-    int r;
+    int ret;
     ABT_cond cond = _cond;
     ABT_mutex lock = _lock;
 
@@ -105,15 +105,17 @@ static int evthread_argobots_cond_wait(void *_cond, void *_lock,
         evutil_timeradd(&now, tv, &abstime);
         ts.tv_sec = abstime.tv_sec;
         ts.tv_nsec = abstime.tv_usec * 1000;
-        r = ABT_cond_timedwait(cond, lock, &ts);
-        if (r != 0) {
+        ret = ABT_cond_timedwait(cond, lock, &ts);
+        if (ABT_ERR_COND_TIMEDOUT == ret) {
             return 1;
+        } else if (ABT_SUCCESS != ret) {
+            return -1;
         } else {
             return 0;
         }
     } else {
-        r = ABT_cond_wait(cond, lock);
-        return r ? -1 : 0;
+        ret = ABT_cond_wait(cond, lock);
+        return ABT_SUCCESS == ret ? 0 : -1;
     }
 }
 
