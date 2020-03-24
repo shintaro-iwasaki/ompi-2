@@ -30,7 +30,6 @@ static void opal_condition_construct(opal_condition_t *c)
     c->c_signaled = 0;
 }
 
-
 static void opal_condition_destruct(opal_condition_t *c)
 {
 }

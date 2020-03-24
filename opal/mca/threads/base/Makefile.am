@@ -22,4 +22,4 @@ headers += \
         base/base.h
 
 libmca_threads_la_SOURCES += \
-        base/threads_base_open.c
+        base/threads_base.c

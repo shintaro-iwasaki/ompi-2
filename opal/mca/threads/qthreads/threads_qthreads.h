@@ -23,14 +23,14 @@
  * $HEADER$
  */
 
-#ifndef  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H
-#define  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H 1
+#ifndef OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H
+#define OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H 1
 
 #include <qthread/qthread.h>
 
-static inline void ensure_init_qthreads(void) {
-	if (qthread_initialize() != 0)
-		qthread_initialize();
+static inline void ensure_init_qthreads(void)
+{
+    qthread_initialize();
 }
 
 #endif /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_H */

@@ -25,7 +25,6 @@ static opal_atomic_int32_t num_thread_in_progress = 0;
 
 #define WAIT_SYNC_PASS_OWNERSHIP(who)                  \
     do {                                               \
-        opal_threads_argobots_ensure_init();           \
         ABT_mutex_lock((who)->lock);                   \
         ABT_cond_signal((who)->condition );            \
         ABT_mutex_unlock((who)->lock);                 \
@@ -33,7 +32,6 @@ static opal_atomic_int32_t num_thread_in_progress = 0;
 
 int ompi_sync_wait_mt(ompi_wait_sync_t *sync)
 {
-    opal_threads_argobots_ensure_init();
     /* Don't stop if the waiting synchronization is completed. We avoid the
      * race condition around the release of the synchronization using the
      * signaling field.

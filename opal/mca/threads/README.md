@@ -16,7 +16,7 @@ The threading model is chosen via the configure option `--with-threads=<threadin
 
 The MCA for threading libraries is implemented in two places, once as a set of `.h` files in `mca/threads/<threading_model>/threads_<threading_model>_{threads,mutex,tsd}.h` which are defined inline to the main thread implementation and also as an MCA component that is loaded at runtime.
 
-For performance reasons, in particular synchonization overhead, it is not possible to implement a threading model as a traditional MCA. This means --at least in the short term-- that threading models are chosen at compile time rather than runtime options, using mechanisms similar to Open MPI's libevent integration.
+For performance reasons, in particular synchronization overhead, it is not possible to implement a threading model as a traditional MCA. This means --at least in the short term-- that threading models are chosen at compile time rather than runtime options, using mechanisms similar to Open MPI's libevent integration.
 
 The .h files are meant to be run on the fast path containing inline synchonization functions (threads_<threading_model>_mutex.h, thread local storage (threads_<threading_model>_tsd.h) and the opal_thread structure (threads_<threading_model>_thread.h).
 

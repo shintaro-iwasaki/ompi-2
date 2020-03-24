@@ -80,7 +80,7 @@ OPAL_DECLSPEC extern bool opal_uses_threads;
  * opal_using_threads().  If configure detected that we have thread
  * support, the return value of future invocations of
  * opal_using_threads() will be the parameter's value.  If configure
- * detected that we have no thread support, then the retuen from
+ * detected that we have no thread support, then the return from
  * opal_using_threads() will always be false.
  */
 static inline bool opal_set_using_threads(bool have)

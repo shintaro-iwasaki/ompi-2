@@ -29,6 +29,8 @@
 #include <pthread.h>
 
 #include "opal/mca/threads/mutex.h"
+#include "opal/mca/threads/pthreads/threads_pthreads_mutex.h"
+#include "opal/constants.h"
 
 /*
  * Wait and see if some upper layer wants to use threads, if support
@@ -63,7 +65,7 @@ static void mca_threads_pthreads_mutex_constructor(opal_mutex_t *p_mutex)
     opal_atomic_lock_init(&p_mutex->m_lock_atomic, 0);
 }
 
-static void mca_threads_pthreads_mutex_desctructor(opal_mutex_t *p_mutex)
+static void mca_threads_pthreads_mutex_destructor(opal_mutex_t *p_mutex)
 {
     pthread_mutex_destroy(&p_mutex->m_lock_pthread);
 }
@@ -84,7 +86,7 @@ static void mca_threads_pthreads_recursive_mutex_constructor
     opal_atomic_lock_init(&p_mutex->m_lock_atomic, 0);
 }
 
-static void mca_threads_pthreads_recursive_mutex_desctructor
+static void mca_threads_pthreads_recursive_mutex_destructor
         (opal_recursive_mutex_t *p_mutex)
 {
     pthread_mutex_destroy(&p_mutex->m_lock_pthread);
@@ -93,9 +95,39 @@ static void mca_threads_pthreads_recursive_mutex_desctructor
 OBJ_CLASS_INSTANCE(opal_mutex_t,
                    opal_object_t,
                    mca_threads_pthreads_mutex_constructor,
-                   mca_threads_pthreads_mutex_desctructor);
+                   mca_threads_pthreads_mutex_destructor);
 
 OBJ_CLASS_INSTANCE(opal_recursive_mutex_t,
                    opal_object_t,
                    mca_threads_pthreads_recursive_mutex_constructor,
-                   mca_threads_pthreads_recursive_mutex_desctructor);
+                   mca_threads_pthreads_recursive_mutex_destructor);
+
+int opal_cond_init(opal_cond_t *cond)
+{
+    int ret = pthread_cond_init(cond, NULL);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
+}
+
+int opal_cond_wait(opal_cond_t *cond, opal_mutex_t *lock)
+{
+    int ret = pthread_cond_wait(cond, &lock->m_lock_pthread);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
+}
+
+int opal_cond_broadcast(opal_cond_t *cond)
+{
+    int ret = pthread_cond_broadcast(cond);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
+}
+
+int opal_cond_signal(opal_cond_t *cond)
+{
+    int ret = pthread_cond_signal(cond);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
+}
+
+int opal_cond_destroy(opal_cond_t *cond)
+{
+    int ret = pthread_cond_destroy(cond);
+    return 0 == ret ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
+}

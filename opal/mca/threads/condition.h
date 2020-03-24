@@ -59,7 +59,7 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_condition_t);
 
 static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
 {
-    int rc = 0;
+    int rc = OPAL_SUCCESS;
     c->c_waiting++;
 
     if (opal_using_threads()) {
@@ -69,7 +69,7 @@ static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
             opal_progress();
             OPAL_CR_TEST_CHECKPOINT_READY_STALL();
             opal_mutex_lock(m);
-            return 0;
+            return rc;
         }
         while (0 == c->c_signaled) {
             opal_mutex_unlock(m);
@@ -94,7 +94,7 @@ static inline int opal_condition_timedwait(opal_condition_t *c, opal_mutex_t *m,
 {
     struct timeval tv;
     struct timeval absolute;
-    int rc = 0;
+    int rc = OPAL_SUCCESS;
 
     c->c_waiting++;
     if (opal_using_threads()) {
@@ -137,13 +137,13 @@ static inline int opal_condition_signal(opal_condition_t *c)
     if (c->c_waiting) {
         c->c_signaled++;
     }
-    return 0;
+    return OPAL_SUCCESS;
 }
 
 static inline int opal_condition_broadcast(opal_condition_t *c)
 {
     c->c_signaled = c->c_waiting;
-    return 0;
+    return OPAL_SUCCESS;
 }
 
 END_C_DECLS

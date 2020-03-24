@@ -125,16 +125,14 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
 
 static inline int opal_mutex_trylock(opal_mutex_t *m)
 {
-#if OPAL_ENABLE_DEBUG
     int ret = pthread_mutex_trylock(&m->m_lock_pthread);
     if (EDEADLK == ret) {
-        errno = ret;
-        opal_output(0,"opal_mutex_trylock() %d",ret);
-    }
-    return ret;
-#else
-    return pthread_mutex_trylock(&m->m_lock_pthread);
+#if OPAL_ENABLE_DEBUG
+        opal_output(0, "opal_mutex_trylock() %d",ret);
 #endif
+        return 1;
+    }
+    return 0 == ret ? 0 : 1;
 }
 
 static inline void opal_mutex_lock(opal_mutex_t *m)
@@ -143,7 +141,7 @@ static inline void opal_mutex_lock(opal_mutex_t *m)
     int ret = pthread_mutex_lock(&m->m_lock_pthread);
     if (EDEADLK == ret) {
         errno = ret;
-        opal_output(0,"opal_mutex_lock() %d", ret);
+        opal_output(0, "opal_mutex_lock() %d", ret);
     }
 #else
     pthread_mutex_lock(&m->m_lock_pthread);
@@ -156,7 +154,7 @@ static inline void opal_mutex_unlock(opal_mutex_t *m)
     int ret = pthread_mutex_unlock(&m->m_lock_pthread);
     if (EPERM == ret) {
         errno = ret;
-        opal_output(0,"opal_mutex_unlock() %d", ret);
+        opal_output(0, "opal_mutex_unlock() %d", ret);
     }
 #else
     pthread_mutex_unlock(&m->m_lock_pthread);
@@ -215,11 +213,12 @@ static inline void opal_mutex_atomic_unlock(opal_mutex_t *m)
 
 typedef pthread_cond_t opal_cond_t;
 #define OPAL_CONDITION_STATIC_INIT PTHREAD_COND_INITIALIZER
-#define opal_cond_init(a)          pthread_cond_init(a, NULL)
-#define opal_cond_wait(a,b)        pthread_cond_wait(a, &(b)->m_lock_pthread)
-#define opal_cond_broadcast(a)     pthread_cond_broadcast(a)
-#define opal_cond_signal(a)        pthread_cond_signal(a)
-#define opal_cond_destroy(a)       pthread_cond_destroy(a)
+
+int opal_cond_init(opal_cond_t *cond);
+int opal_cond_wait(opal_cond_t *cond, opal_mutex_t *lock);
+int opal_cond_broadcast(opal_cond_t *cond);
+int opal_cond_signal(opal_cond_t *cond);
+int opal_cond_destroy(opal_cond_t *cond);
 
 END_C_DECLS
 

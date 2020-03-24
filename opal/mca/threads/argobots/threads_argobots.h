@@ -30,7 +30,7 @@
 
 static inline void opal_threads_argobots_ensure_init(void)
 {
-    if (ABT_initialized() != 0) {
+    if (ABT_SUCCESS != ABT_initialized()) {
         ABT_init(0, 0);
     }
 }

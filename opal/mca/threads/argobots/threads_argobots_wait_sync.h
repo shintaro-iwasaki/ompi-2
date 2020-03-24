@@ -52,7 +52,6 @@ typedef struct ompi_wait_sync_t {
  * the critical path. */
 #define WAIT_SYNC_RELEASE(sync)                       \
     if (opal_using_threads()) {                       \
-        opal_threads_argobots_ensure_init();          \
         while ((sync)->signaling) {                   \
             ABT_thread_yield();                       \
             continue;                                 \
@@ -63,7 +62,6 @@ typedef struct ompi_wait_sync_t {
 
 #define WAIT_SYNC_RELEASE_NOWAIT(sync)                \
     if (opal_using_threads()) {                       \
-        opal_threads_argobots_ensure_init();          \
         ABT_cond_free(&(sync)->condition);            \
         ABT_mutex_free(&(sync)->lock);                \
     }
@@ -71,7 +69,6 @@ typedef struct ompi_wait_sync_t {
 
 #define WAIT_SYNC_SIGNAL(sync)                        \
     if (opal_using_threads()) {                       \
-        opal_threads_argobots_ensure_init();          \
         ABT_mutex_lock(sync->lock);                   \
         ABT_cond_signal(sync->condition);             \
         ABT_mutex_unlock(sync->lock);                 \
@@ -86,7 +83,6 @@ typedef struct ompi_wait_sync_t {
 OPAL_DECLSPEC int ompi_sync_wait_mt(ompi_wait_sync_t *sync);
 static inline int sync_wait_st(ompi_wait_sync_t *sync)
 {
-    opal_threads_argobots_ensure_init();
     while (sync->count > 0) {
         opal_progress();
         ABT_thread_yield();
@@ -103,9 +99,8 @@ static inline int sync_wait_st(ompi_wait_sync_t *sync)
         (sync)->status = 0;                                     \
         (sync)->signaling = (0 != (c));                         \
         if (opal_using_threads()) {                             \
-            opal_threads_argobots_ensure_init();                \
-            ABT_cond_create (&(sync)->condition);               \
-            ABT_mutex_create (&(sync)->lock);                   \
+            ABT_cond_create(&(sync)->condition);                \
+            ABT_mutex_create(&(sync)->lock);                    \
         }                                                       \
     } while (0)
 

@@ -26,3 +26,5 @@ libmca_threads_qthreads_la_SOURCES = \
     threads_qthreads_mutex.c \
     threads_qthreads_condition.c \
     threads_qthreads_module.c
+
+AM_LDFLAGS = -lqthread

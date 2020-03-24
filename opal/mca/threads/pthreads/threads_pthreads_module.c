@@ -71,7 +71,7 @@ int opal_thread_join(opal_thread_t *t, void **thr_return)
 {
     int rc = pthread_join(t->t_handle, thr_return);
     t->t_handle = (pthread_t)-1;
-    return (0 == rc) ? OPAL_SUCCESS : OPAL_ERROR;
+    return 0 == rc ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
 }
 
 void opal_thread_set_main(void)
@@ -84,17 +84,17 @@ int opal_thread_start(opal_thread_t *t)
     int rc;
 
     if (OPAL_ENABLE_DEBUG) {
-        if (NULL == t->t_run || t->t_handle != (pthread_t)-1) {
+        if (NULL == t->t_run || (pthread_t)-1 != t->t_handle) {
             return OPAL_ERR_BAD_PARAM;
         }
     }
 
     rc = pthread_create(&t->t_handle, NULL, (void *(*)(void *))t->t_run, t);
 
-    return (0 == rc) ? OPAL_SUCCESS : OPAL_ERROR;
+    return 0 == rc ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
 }
 
-opal_class_t opal_thread_t_class;
+OBJ_CLASS_DECLARATION(opal_thread_t);
 
 int opal_tsd_key_create(opal_tsd_key_t *key, opal_tsd_destructor_t destructor)
 {
@@ -108,7 +108,7 @@ int opal_tsd_key_create(opal_tsd_key_t *key, opal_tsd_destructor_t destructor)
         opal_tsd_key_values[opal_tsd_key_values_count].destructor = destructor;
         opal_tsd_key_values_count++;
     }
-    return rc;
+    return 0 == rc ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
 }
 
 int opal_tsd_keys_destruct(void)

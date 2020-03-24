@@ -26,8 +26,8 @@
  * $HEADER$
  */
 
-#ifndef  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H
-#define  OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H 1
+#ifndef OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H
+#define OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H 1
 
 /**
  * @file:
@@ -67,8 +67,6 @@ struct opal_mutex_t {
     opal_atomic_lock_t m_lock_atomic;
 };
 
-typedef aligned_t opal_qthreads_mutex_t;
-
 OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_mutex_t);
 OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
 
@@ -76,7 +74,7 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
 #define OPAL_MUTEX_STATIC_INIT                                          \
     {                                                                   \
         .super = OPAL_OBJ_STATIC_INIT(opal_mutex_t),                    \
-        .m_lock_qthreads = 0,                         \
+        .m_lock_qthreads = 0,                                           \
         .m_recursive = 0,                                               \
         .m_lock_debug = 0,                                              \
         .m_lock_file = NULL,                                            \
@@ -87,16 +85,28 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
 #define OPAL_MUTEX_STATIC_INIT                                          \
     {                                                                   \
         .super = OPAL_OBJ_STATIC_INIT(opal_mutex_t),                    \
-        .m_lock_qthreads = 0,                         \
+        .m_lock_qthreads = 0,                                           \
         .m_recursive = 0,                                               \
         .m_lock_atomic = OPAL_ATOMIC_LOCK_INIT,                         \
     }
 #endif
 
+#if OPAL_ENABLE_DEBUG
 #define OPAL_RECURSIVE_MUTEX_STATIC_INIT                                \
     {                                                                   \
         .super = OPAL_OBJ_STATIC_INIT(opal_mutex_t),                    \
-        .m_lock_qthreads = 0,                         \
+        .m_lock_qthreads = 0,                                           \
+        .m_recursive = 1,                                               \
+        .m_lock_debug = 0,                                              \
+        .m_lock_file = NULL,                                            \
+        .m_lock_line = 0,                                               \
+        .m_lock_atomic = OPAL_ATOMIC_LOCK_INIT,                         \
+    }
+#else
+#define OPAL_RECURSIVE_MUTEX_STATIC_INIT                                \
+    {                                                                   \
+        .super = OPAL_OBJ_STATIC_INIT(opal_mutex_t),                    \
+        .m_lock_qthreads = 0,                                           \
         .m_recursive = 1,                                               \
         .m_lock_atomic = OPAL_ATOMIC_LOCK_INIT,                         \
     }
@@ -108,19 +118,22 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
  *
  ************************************************************************/
 
-static inline void opal_mutex_create(struct opal_mutex_t *m) {
+static inline void opal_mutex_create(struct opal_mutex_t *m)
+{
 }
 
 static inline int opal_mutex_trylock(opal_mutex_t *m)
 {
     ensure_init_qthreads();
 
-    return qthread_readFE_nb(NULL, &m->m_lock_qthreads);
+    return 0 == qthread_readFE_nb(NULL, &m->m_lock_qthreads) ? OPAL_SUCCESS
+                                                             : OPAL_ERROR;
 }
 
 static inline void opal_mutex_lock(opal_mutex_t *m)
 {
     ensure_init_qthreads();
+
     qthread_lock(&m->m_lock_qthreads);
 }
 
@@ -183,37 +196,15 @@ static inline void opal_mutex_atomic_unlock(opal_mutex_t *m)
 
 #endif
 
-typedef aligned_t* opal_cond_t;
+typedef aligned_t *opal_cond_t;
 #define OPAL_CONDITION_STATIC_INIT 0
 
-static inline void opal_cond_create(opal_cond_t *cond) {
-    ensure_init_qthreads();
-}
-
-static inline int opal_cond_init(opal_cond_t *cond) {
-    return 0;
-}
-
-static inline int opal_cond_wait(opal_cond_t *cond, opal_mutex_t *lock) {
-    ensure_init_qthreads();
-    return qthread_readFE(*cond, &lock->m_lock_qthreads);
-}
-
-static inline int opal_cond_broadcast(opal_cond_t *cond) {
-    ensure_init_qthreads();
-    return qthread_fill(*cond);
-}
-
-static inline int opal_cond_signal(opal_cond_t *cond) {
-    ensure_init_qthreads();
-    return qthread_fill(*cond);
-}
-
-static inline int opal_cond_destroy(opal_cond_t *cond) {
-    ensure_init_qthreads();
-    return 0;
-}
+int opal_cond_init(opal_cond_t *cond);
+int opal_cond_wait(opal_cond_t *cond, opal_mutex_t *lock);
+int opal_cond_broadcast(opal_cond_t *cond);
+int opal_cond_signal(opal_cond_t *cond);
+int opal_cond_destroy(opal_cond_t *cond);
 
 END_C_DECLS
 
-#endif           /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H */
+#endif /* OPAL_MCA_THREADS_QTHREADS_THREADS_QTHREADS_MUTEX_H */
