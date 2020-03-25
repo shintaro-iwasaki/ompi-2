@@ -1,4 +1,3 @@
-/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2004-2007 The Trustees of Indiana University and Indiana
  *                         University Research and Technology
@@ -24,7 +23,6 @@
  *
  * $HEADER$
  */
-
 #ifndef OPAL_MCA_THREADS_CONDITION_H
 #define OPAL_MCA_THREADS_CONDITION_H
 
@@ -59,7 +57,7 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_condition_t);
 
 static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
 {
-    int rc = OPAL_SUCCESS;
+    int rc = 0;
     c->c_waiting++;
 
     if (opal_using_threads()) {
@@ -69,16 +67,16 @@ static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
             opal_progress();
             OPAL_CR_TEST_CHECKPOINT_READY_STALL();
             opal_mutex_lock(m);
-            return rc;
+            return 0;
         }
-        while (0 == c->c_signaled) {
+        while (c->c_signaled == 0) {
             opal_mutex_unlock(m);
             opal_progress();
             OPAL_CR_TEST_CHECKPOINT_READY_STALL();
             opal_mutex_lock(m);
         }
     } else {
-        while (0 == c->c_signaled) {
+        while (c->c_signaled == 0) {
             opal_progress();
             OPAL_CR_TEST_CHECKPOINT_READY_STALL();
         }
@@ -89,45 +87,44 @@ static inline int opal_condition_wait(opal_condition_t *c, opal_mutex_t *m)
     return rc;
 }
 
-static inline int opal_condition_timedwait(opal_condition_t *c, opal_mutex_t *m,
+static inline int opal_condition_timedwait(opal_condition_t *c,
+                                           opal_mutex_t *m,
                                            const struct timespec *abstime)
 {
     struct timeval tv;
     struct timeval absolute;
-    int rc = OPAL_SUCCESS;
+    int rc = 0;
 
     c->c_waiting++;
     if (opal_using_threads()) {
         absolute.tv_sec = abstime->tv_sec;
         absolute.tv_usec = abstime->tv_nsec / 1000;
-        gettimeofday(&tv, NULL);
-        if (0 == c->c_signaled) {
+        gettimeofday(&tv,NULL);
+        if (c->c_signaled == 0) {
             do {
                 opal_mutex_unlock(m);
                 opal_progress();
-                gettimeofday(&tv, NULL);
+                gettimeofday(&tv,NULL);
                 opal_mutex_lock(m);
-            } while (0 == c->c_signaled && (tv.tv_sec <= absolute.tv_sec ||
-                                            (tv.tv_sec == absolute.tv_sec &&
-                                             tv.tv_usec < absolute.tv_usec)));
+                } while (c->c_signaled == 0 &&
+                         (tv.tv_sec <= absolute.tv_sec ||
+                          (tv.tv_sec == absolute.tv_sec && tv.tv_usec < absolute.tv_usec)));
         }
     } else {
         absolute.tv_sec = abstime->tv_sec;
         absolute.tv_usec = abstime->tv_nsec / 1000;
-        gettimeofday(&tv, NULL);
-        if (0 == c->c_signaled) {
+        gettimeofday(&tv,NULL);
+        if (c->c_signaled == 0) {
             do {
                 opal_progress();
-                gettimeofday(&tv, NULL);
-            } while (0 == c->c_signaled && (tv.tv_sec <= absolute.tv_sec ||
-                                            (tv.tv_sec == absolute.tv_sec &&
-                                             tv.tv_usec < absolute.tv_usec)));
+                gettimeofday(&tv,NULL);
+                } while (c->c_signaled == 0 &&
+                         (tv.tv_sec <= absolute.tv_sec ||
+                          (tv.tv_sec == absolute.tv_sec && tv.tv_usec < absolute.tv_usec)));
         }
     }
 
-    if (0 != c->c_signaled) {
-        c->c_signaled--;
-    }
+    if (c->c_signaled != 0) c->c_signaled--;
     c->c_waiting--;
     return rc;
 }
@@ -137,15 +134,16 @@ static inline int opal_condition_signal(opal_condition_t *c)
     if (c->c_waiting) {
         c->c_signaled++;
     }
-    return OPAL_SUCCESS;
+    return 0;
 }
 
 static inline int opal_condition_broadcast(opal_condition_t *c)
 {
     c->c_signaled = c->c_waiting;
-    return OPAL_SUCCESS;
+    return 0;
 }
 
 END_C_DECLS
 
 #endif /* OPAL_MCA_THREADS_CONDITION_H */
+

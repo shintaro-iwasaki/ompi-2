@@ -47,7 +47,6 @@
 
 #include "opal/class/opal_object.h"
 #include "opal/sys/atomic.h"
-#include "opal/util/output.h"
 
 BEGIN_C_DECLS
 
@@ -68,11 +67,9 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_mutex_t);
 OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
 
 #if defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
-#define OPAL_PTHREAD_RECURSIVE_MUTEX_INITIALIZER \
-            PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+#define OPAL_PTHREAD_RECURSIVE_MUTEX_INITIALIZER PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
 #elif defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
-#define OPAL_PTHREAD_RECURSIVE_MUTEX_INITIALIZER \
-            PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#define OPAL_PTHREAD_RECURSIVE_MUTEX_INITIALIZER PTHREAD_RECURSIVE_MUTEX_INITIALIZER
 #endif
 
 #if OPAL_ENABLE_DEBUG
@@ -125,23 +122,27 @@ OPAL_DECLSPEC OBJ_CLASS_DECLARATION(opal_recursive_mutex_t);
 
 static inline int opal_mutex_trylock(opal_mutex_t *m)
 {
-    int ret = pthread_mutex_trylock(&m->m_lock_pthread);
-    if (EDEADLK == ret) {
 #if OPAL_ENABLE_DEBUG
-        opal_output(0, "opal_mutex_trylock() %d",ret);
-#endif
-        return 1;
+    int ret = pthread_mutex_trylock(&m->m_lock_pthread);
+    if (ret == EDEADLK) {
+        errno = ret;
+        perror("opal_mutex_trylock()");
+        abort();
     }
-    return 0 == ret ? 0 : 1;
+    return ret;
+#else
+    return pthread_mutex_trylock(&m->m_lock_pthread);
+#endif
 }
 
 static inline void opal_mutex_lock(opal_mutex_t *m)
 {
 #if OPAL_ENABLE_DEBUG
     int ret = pthread_mutex_lock(&m->m_lock_pthread);
-    if (EDEADLK == ret) {
+    if (ret == EDEADLK) {
         errno = ret;
-        opal_output(0, "opal_mutex_lock() %d", ret);
+        perror("opal_mutex_lock()");
+        abort();
     }
 #else
     pthread_mutex_lock(&m->m_lock_pthread);
@@ -152,9 +153,10 @@ static inline void opal_mutex_unlock(opal_mutex_t *m)
 {
 #if OPAL_ENABLE_DEBUG
     int ret = pthread_mutex_unlock(&m->m_lock_pthread);
-    if (EPERM == ret) {
+    if (ret == EPERM) {
         errno = ret;
-        opal_output(0, "opal_mutex_unlock() %d", ret);
+        perror("opal_mutex_unlock");
+        abort();
     }
 #else
     pthread_mutex_unlock(&m->m_lock_pthread);
