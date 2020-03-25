@@ -38,6 +38,7 @@ struct opal_tsd_key_value {
 };
 
 static pthread_t opal_main_thread;
+static opal_mutex_t opal_tsd_lock = OPAL_MUTEX_STATIC_INIT;
 struct opal_tsd_key_value *opal_tsd_key_values = NULL;
 static int opal_tsd_key_values_count = 0;
 
@@ -100,13 +101,15 @@ int opal_tsd_key_create(opal_tsd_key_t *key, opal_tsd_destructor_t destructor)
 {
     int rc;
     rc = pthread_key_create(key, destructor);
-    if ((0 == rc) && (pthread_self() == opal_main_thread)) {
+    if (0 == rc) {
+        opal_mutex_lock(&opal_tsd_lock);
         opal_tsd_key_values = (struct opal_tsd_key_value *)
             realloc(opal_tsd_key_values, (opal_tsd_key_values_count + 1) *
                                              sizeof(struct opal_tsd_key_value));
         opal_tsd_key_values[opal_tsd_key_values_count].key = *key;
         opal_tsd_key_values[opal_tsd_key_values_count].destructor = destructor;
         opal_tsd_key_values_count++;
+        opal_mutex_unlock(&opal_tsd_lock);
     }
     return 0 == rc ? OPAL_SUCCESS : OPAL_ERR_IN_ERRNO;
 }
@@ -115,6 +118,7 @@ int opal_tsd_keys_destruct(void)
 {
     int i;
     void *ptr;
+    opal_mutex_lock(&opal_tsd_lock);
     for (i = 0; i < opal_tsd_key_values_count; i++) {
         if (OPAL_SUCCESS ==
             opal_tsd_getspecific(opal_tsd_key_values[i].key, &ptr)) {
@@ -128,6 +132,7 @@ int opal_tsd_keys_destruct(void)
         free(opal_tsd_key_values);
         opal_tsd_key_values_count = 0;
     }
+    opal_mutex_unlock(&opal_tsd_lock);
     return OPAL_SUCCESS;
 }
 
